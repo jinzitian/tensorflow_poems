@@ -19,9 +19,7 @@
 import collections
 import numpy as np
 import tensorflow as tf
-from tensorflow.contrib.seq2seq import sequence_loss
 from model import rnn_model
-from tensorflow.python import debug as tf_debug
 import os
 import sys
 
@@ -41,7 +39,6 @@ end_token = 'E'
 
 
 def process_poems():
-    # 诗集
     poems = []
     with open(FLAGS.file_name, "r", encoding='utf-8', ) as f:
         for line in f.readlines():
@@ -57,22 +54,15 @@ def process_poems():
                 poems.append(content)
             except ValueError as e:
                 pass
-    # 按诗的字数排序
     poems = sorted(poems, key=lambda l: len(line))
     print('唐诗总数: ', len(poems))
-
-    # 统计每个字出现次数
     all_words = []
     for poem in poems:
         all_words += [word for word in poem]
-    # 这里根据包含了每个字对应的频率
     counter = collections.Counter(all_words)
     count_pairs = sorted(counter.items(), key=lambda x: -x[1])
     words, _ = zip(*count_pairs)
-
-    # 取前多少个常用字
     words = words[:len(words)] + (' ',)
-    # 每个字映射为一个数字ID
     word_int_map = dict(zip(words, range(len(words))))
     poems_vector = [list(map(lambda word: word_int_map.get(word, len(words)), poem)) for poem in poems]
 
@@ -80,7 +70,6 @@ def process_poems():
 
 
 def generate_batch(batch_size, poems_vec, word_to_int):
-    # 每次取64首诗进行训练
     n_chunk = len(poems_vec) // batch_size
     x_batches = []
     y_batches = []
@@ -89,21 +78,13 @@ def generate_batch(batch_size, poems_vec, word_to_int):
         end_index = start_index + batch_size
 
         batches = poems_vec[start_index:end_index]
-        # 找到这个batch的所有poem中最长的poem的长度
         length = max(map(len, batches))
-        # 填充一个这么大小的空batch，空的地方放空格对应的index标号
         x_data = np.full((batch_size, length), word_to_int[' '], np.int32)
         for row in range(batch_size):
-            # 每一行就是一首诗，在原本的长度上把诗还原上去
             x_data[row, :len(batches[row])] = batches[row]
         y_data = np.copy(x_data)
-        # y的话就是x向左边也就是前面移动一个
         y_data[:, :-1] = x_data[:, 1:]
-        """
-        x_data             y_data
-        [6,2,4,6,9]       [2,4,6,9,9]
-        [1,4,2,8,5]       [4,2,8,5,5]
-        """
+
         x_batches.append(x_data)
         y_batches.append(y_data)
     return x_batches, y_batches
@@ -125,8 +106,6 @@ def run_training():
     saver = tf.train.Saver(tf.global_variables())
     init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
     with tf.Session() as sess:
-        # sess = tf_debug.LocalCLIDebugWrapperSession(sess=sess)
-        # sess.add_tensor_filter("has_inf_or_nan", tf_debug.has_inf_or_nan)
         sess.run(init_op)
 
         start_epoch = 0
@@ -195,7 +174,6 @@ def gen_poem():
             [predict, last_state] = sess.run([end_points['prediction'], end_points['last_state']],
                                              feed_dict={input_data: x, end_points['initial_state']: last_state})
             word = to_word(predict, vocabularies)
-        # word = words[np.argmax(probs_)]
         return poem
 
 
