@@ -42,9 +42,8 @@ We are consider name this ai program, let's build it to be more powerful!
 本博客讲讲解一些里面实现的技术细节，如果有未尽之处，大家可以通过微信找到我，那个头像很神奇的男人。闲话不多说，先把github链接放上来，这个作诗机器人我会一直维护，如果大家因为时间太紧没有时间看，可以给这个项目star一下或者fork，
 我一推送更新你就能看到，主要是为了修复一些api问题，tensorflow虽然到了1.0，但是api还是会变化。
 把星星加起来，让更多人可以看到我们创造这个作诗机器人，后期会加入更多牛逼掉渣天的功能，比如说押韵等等。
-
-![机器人做的古诗](http://ofwzcunzi.bkt.clouddn.com/EZPgxTi5ZBrBXK8p.png)
-
+![PicName](http://ofwzcunzi.bkt.clouddn.com/g5mWOsHXapTAfkIV.png)
+![PicName](http://ofwzcunzi.bkt.clouddn.com/kVBfrCdd7ncvpaxj.png)
 ### Install tensorflow_poems
 
 * 安装要求：
